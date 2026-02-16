@@ -3,6 +3,7 @@
 
 A Snakemake workflow for running multiple structural‐variant (SV) callers on short-reads data and benchmarking their results against a single truth set with **[truvari](https://github.com/spiralgenetics/truvari)**.
 
+An equivalent **[omnibenchmark](https://docs.omnibenchmark.org/latest/)** pipeline (with a subset of callers) can be found at: https://github.com/cphgeno/OB_SV_BENCHMARK_GERMLINE_SHORTREADS-main. This pipeline has been implemented with omnibenchmark v.0.3.2.  
 ---
 
 ##  Features
