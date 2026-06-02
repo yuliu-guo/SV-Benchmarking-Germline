@@ -22,5 +22,4 @@ snakemake --configfile minigraph-cactus-config-hprc_v1.0_pped.yaml \
         --printshellcmds \
         --rerun-triggers mtime \
         --rerun-incomplete #--dry-run
-        #--cluster "qsub -W group_list=external-rh_rh_gm -A external-rh_rh_gm -l walltime={resources.walltime_h}:00:00 -l mem={resources.mem_gb}GB -l nodes=1:ppn={threads} -o snakemake_logs/{rule}.o{jobid} -e snakemake_logs/{rule}.e{jobid}"
         
