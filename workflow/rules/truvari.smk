@@ -27,6 +27,7 @@ rule split_svtypes:
 rule truvari:
     input:
         test_vcf=config["output"] + "/callers/{caller}/{sample}.final.vcf.gz",
+        sub_bed=config["truvari_bed"], 
         test_vcf_tbi=config["output"] + "/callers/{caller}/{sample}.final.vcf.gz.tbi",
         true_vcf=config["sample_path"] + "{sample}.vcf.gz",
         ref=config["reference"],
@@ -54,39 +55,8 @@ rule truvari:
         (mkdir -p {params.prefix};
         rm -rf {params.prefix}/temp;
         rm -rf {params.prefix}/phab_bench;
-        truvari bench -b {input.true_vcf} -c {input.test_vcf} -o {params.prefix}/temp {params.setting};
+        truvari bench -b {input.true_vcf}  -f {input.ref}  --includebed {input.sub_bed} --extend 500 -c {input.test_vcf} -o {params.prefix}/temp {params.setting};
         mv --force {params.prefix}/temp/* {params.prefix}/.;) > {log} 2>&1
-        """
-
-
-rule truvari_refine:
-    input:
-        test_vcf=config["output"] + "/callers/{caller}/{sample}.final.vcf.gz",
-        test_vcf_tbi=config["output"] + "/callers/{caller}/{sample}.final.vcf.gz.tbi",
-        true_vcf=config["sample_path"] + "{sample}.vcf.gz",
-        ref=config["reference"],
-        summary=rules.truvari.output.summary,
-    output:
-        summary=config["output"]
-        + "/truvari/{type}/{caller}/{sample}/refine.variant_summary.json",
-    log:
-        config["output"] + "/logs/truvari/{type}/{caller}/{sample}-refine.log",
-    params:
-        name="{type}",
-        prefix=config["output"] + "/truvari/{type}/{caller}/{sample}",
-        setting=lambda wildcards: config["truvari_runs"][wildcards.type],
-    resources:
-        mem_mb=40000,
-        walltime_h=10,
-    threads: 4
-    envmodules:
-        "truvari/" + config["truvari_version"],
-    shell:
-        """
-        (rm -rf {params.prefix}/phab_bench;
-        rm -f {params.prefix}/phab.output.vcf.gz;
-        truvari refine --threads {threads} -R -U -f {input.ref} --align wfa --regions {params.prefix}/candidate.refine.bed {params.prefix}/;
-        ) > {log} 2>&1
         """
 
 
@@ -95,20 +65,9 @@ use rule truvari as truvari_deletion with:
     input:
         test_vcf=config["output"] + "/callers/{caller}/{sample}.vcf.gz",
         test_vcf_tbi=config["output"] + "/callers/{caller}/{sample}.vcf.gz.tbi",
+        sub_bed=config["truvari_bed"], 
         true_vcf=config["sample_path"] + "{sample}_del.vcf.gz",
         ref=config["reference"],
-    wildcard_constraints:
-        caller="popdel",
-
-
-# use only deletions on callers that only call deletions
-use rule truvari_refine as truvari_deletion_refine with:
-    input:
-        test_vcf=config["output"] + "/callers/{caller}/{sample}.vcf.gz",
-        test_vcf_tbi=config["output"] + "/callers/{caller}/{sample}.vcf.gz.tbi",
-        true_vcf=config["sample_path"] + "{sample}_del.vcf.gz",
-        ref=config["reference"],
-        summary=rules.truvari_deletion.output.summary,
     wildcard_constraints:
         caller="popdel",
 

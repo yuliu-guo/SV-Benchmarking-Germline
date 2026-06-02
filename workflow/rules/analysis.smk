@@ -1,3 +1,4 @@
+# generates fig 1a
 rule summary_analysis:
     input:
         expand(
@@ -15,54 +16,55 @@ rule summary_analysis:
     resources:
         mem_mb=8000,
         walltime_h=1,
+    params: 
+        results_dir = config["output"]
     envmodules:
-        "R/" + config["R_version"],
-        "R-bundle-Bioconductor/3.20-foss-2024a-R-4.4.2",
+        "R-bundle-Bioconductor/3.22-foss-2025a-R-4.5.1",
+        "R-bundle-PREDICT/1.0.1-foss-2025a"
     shell:
         """
-        Rscript {input.script} > {log} 2>&1
+        Rscript {input.script} -i {params.results_dir} > {log} 2>&1
         """
 
 
+# generates fig 1b (SVLEN) 
 rule vcf_analysis:
     input:
-        expand(
-            rules.truvari.output.summary,
-            type=config["truvari_runs"],
-            sample=SAMPLES,
-            caller=CALLERS,
-            output=config["output"],
-        ),
         script="workflow/r-scripts/02-vcf-investigation.R",
         data=rules.summary_analysis.output,
     output:
-        config["output"] + "/truvari/type-ignored/pctsizesimilarity_violin.png",
+        config["output"] + "/truvari/type-ignored/fig1_count_split_TP.Rds",
     log:
         config["output"] + "/logs/truvari-summary.log",
+    params: 
+        results_dir = config["output"]
     resources:
         mem_mb=16000,
         walltime_h=2,
     envmodules:
-        "openssl/" + config["openssl_version"],
-        "R/" + config["R_version"],
+        "R-bundle-DALYCA/1.0.6-foss-2024a",
+        "R-bundle-Bioconductor/3.22-foss-2025a-R-4.5.1",
+        "R-bundle-PREDICT/1.0.1-foss-2025a"
     shell:
         """
-
-        Rscript --vanilla {input.script} > {log} 2>&1
-
+        Rscript {input.script} -i {params.results_dir} > {log} 2>&1
         """
 
+# RUN 03 OFF SERVER FOR GT COMPLILATION 
 
+# RUN 04 MANUALLY - COMPARES TWO RUNS OF THIS PIPELINE
+
+# 05 upsetr analysis 
 rule upset_analysis:
     input:
         json=expand(
             rules.truvari_consistency.output.json,
             type="type-ignored",
-            sample="NA12878",
+            sample=SAMPLES,
             svtype=SVTYPES,
             output=config["output"],
         ),
-        script="workflow/r-scripts/upsetr_const.R",
+        script="workflow/r-scripts/05-upsetr_const.R",
         data=rules.summary_analysis.output,
     output:
         config["output"] + "/truvari/type-ignored/_upset-degreesort.png",
@@ -72,45 +74,17 @@ rule upset_analysis:
         mem_mb=8000,
         walltime_h=1,
     envmodules:
-        "openssl/" + config["openssl_version"],
-        "R/" + config["R_version"],
+        "R-bundle-DALYCA/1.0.6-foss-2024a",
+        "R-bundle-Bioconductor/3.22-foss-2025a-R-4.5.1",
+        "R-bundle-PREDICT/1.0.1-foss-2025a", 
+    params: 
+        results_dir = config["output"]
     shell:
         """
-
-        Rscript --vanilla {input.script} > {log} 2>&1
-
+        Rscript {input.script} > {log} 2>&1
         """
 
-
-rule width_analysis:
-    input:
-        expand(
-            rules.truvari.output.summary,
-            type=config["truvari_runs"],
-            sample=SAMPLES,
-            caller=CALLERS,
-            output=config["output"],
-        ),
-        script="workflow/r-scripts/05-tpbase.R",
-        data=rules.summary_analysis.output,
-    output:
-        config["output"] + "/truvari/type-ignored/count_plot.png",
-    log:
-        config["output"] + "/logs/truvari-upset.log",
-    resources:
-        mem_mb=8000,
-        walltime_h=1,
-    envmodules:
-        "openssl/" + config["openssl_version"],
-        "R/" + config["R_version"],
-    shell:
-        """
-
-        Rscript --vanilla {input.script} FALSE > {log} 2>&1
-
-        """
-
-
+# 06 benchmark plots 
 rule benchmark_analysis:
     input:
         expand(
@@ -119,7 +93,7 @@ rule benchmark_analysis:
             caller=CALLERS,
             output=config["output"],
         ),
-        script="workflow/r-scripts/03-benchmarks.R",
+        script="workflow/r-scripts/06-benchmarks.R",
     output:
         config["output"] + "/benchmarks/caller-summary.csv",
     log:
@@ -128,8 +102,8 @@ rule benchmark_analysis:
         mem_mb=8000,
         walltime_h=1,
     envmodules:
-        "openssl/" + config["openssl_version"],
-        "R/" + config["R_version"],
+        "R-bundle-Bioconductor/3.22-foss-2025a-R-4.5.1",
+        "R-bundle-PREDICT/1.0.1-foss-2025a"
     shell:
         """
 

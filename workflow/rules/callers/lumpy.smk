@@ -2,7 +2,6 @@
 ### LUMPY ###
 ##############
 
-
 def get_scratch_directory(
     subdirs: List[str], force_workdir_scratch: bool = False
 ) -> str:
@@ -18,17 +17,11 @@ def get_scratch_directory(
         If true, force the scratch directory inside of the
         working directory.
     """
-    jobid = os.environ.get("PBS_JOBID", None)
-    basedir = None
-    if not jobid or force_workdir_scratch:
-        basedir = Path(pipeline_workdir).joinpath("scratch")
-    else:
-        basedir = Path("/scratch").joinpath(jobid)
+    basedir = Path(pipeline_workdir).joinpath("scratch")
     if subdirs:
         for element in subdirs:
             basedir = basedir.joinpath(element)
     return basedir.as_posix()
-
 
 rule variants_cnv_discordant_reads:
     input:
@@ -48,13 +41,12 @@ rule variants_cnv_discordant_reads:
     resources:
         mem_mb=80000,
         walltime_h=10,
-    singularity:
-        "/ngc/projects/gm/pipelines/container_repository/singularity/samtools/samtools_1.10-htslib_1.10__v0.1__.sif"
     envmodules:
         "samtools/" + config["samtools_version"],
     shell:
         """
         (
+        ml samtools/1.10
 
          echo "Creating temporary directories..."
 
@@ -67,7 +59,6 @@ rule variants_cnv_discordant_reads:
          echo "Filtering and sorting discordant reads..."
 
          samtools view -T {input.ref} -h -u -F 1294 {input.cram} \
-
              | samtools sort -T {params.tmp2}/tmp -o {params.tmp1}/sorted.bam -
 
 
@@ -121,18 +112,17 @@ rule variants_cnv_split_reads:
     resources:
         mem_mb=80000,
         walltime_h=20,
-    singularity:
-        "/ngc/projects/gm/pipelines/container_repository/singularity/samtools/samtools_1.10-htslib_1.10__v0.1__.sif"
     envmodules:
-        "anaconda2/" + config["anaconda2_version"],
+        "Anaconda2/" + config["anaconda2_version"],
         "samblaster/" + config["samblaster_version"],
         "sambamba/" + config["sambamba_version"],
-        "samtools/" + config["samtools_version"],
         "lumpy/" + config["lumpy_version"],
+        "samtools/" + config["samtools_version"],
     shell:
         """
         echo "Starting split_reads for {wildcards.sample}" > {log}
         (
+        ml samtools/1.10
         echo "Creating temporary directories... {params.tmp1} and {params.tmp2}"
         mkdir -p {params.tmp1}
         mkdir -p {params.tmp2}
@@ -207,14 +197,12 @@ rule lumpy_calling:
     resources:
         mem_mb=80000,
         walltime_h=16,
-    singularity:
-        "/ngc/projects/gm/pipelines/container_repository/singularity/lumpy/lumpy_0.3.1-samtools_1.10-pysam__v0.1__.sif"
     envmodules:
-        "anaconda2/" + config["anaconda2_version"],
+        "Anaconda2/" + config["anaconda2_version"],
         "samblaster/" + config["samblaster_version"],
         "sambamba/" + config["sambamba_version"],
         "samtools/" + config["samtools_version"],
-        "lumpy/" + config["lumpy_version"],
+        "LUMPY/" + config["lumpy_version"],
     shell:
         # Using modified version of lumpyexpress (which does not fail when calling samtools view)
         " ({lumpyexpress} -v "
@@ -227,6 +215,7 @@ rule lumpy_calling:
         ") > {log} 2>&1 "
 
 
+# TODO find svtyper-sso
 rule lumpy_genotypes:
     input:
         cram=config["sample_path"] + "{sample}.cram",
@@ -243,15 +232,13 @@ rule lumpy_genotypes:
     resources:
         mem_mb=80000,
         walltime_h=16,
-    singularity:
-        "/ngc/projects/gm/pipelines/container_repository/singularity/smoove/smoove_0.2.8-svtyper_0.7.1-python_2.7__v0.1__.sif"
     shell:
         # Call genotypes
-        "( svtyper-sso "
+        " svtyper-sso "
         "     --core {threads} "
         "     -i {input.vcf} "
         "     -B {input.cram} "
-        "     > {output.vcf} "
+        "     > {output.vcf}; "
         ") > {log} 2>&1 "
 
 
@@ -272,13 +259,11 @@ rule lumpy_postprocess:
         mem_gb=16,
         mem_mb=16000,
         walltime_h=4,
-    singularity:
-        "/ngc/projects/gm/pipelines/container_repository/singularity/gatk/gatk_4.2.6.1-java_1.8.0-htslib_1.10.2__v0.1__.sif"
     envmodules:
-        "htslib/" + config["htslib_version"],
+        "HTSlib/" + config["htslib_version"],
         "bcftools/" + config["bcftools_version"],
-        "java/" + config["java_version"],
-        "gatk/" + config["gatk_version"],
+        "Java/" + config["java_version"],
+        "GATK/" + config["gatk_version"],
     shell:
         "(gatk --java-options '-Xmx{resources.mem_gb}g' SortVcf "
         "     --INPUT {input.vcf} "

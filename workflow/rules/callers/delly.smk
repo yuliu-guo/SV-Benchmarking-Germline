@@ -13,15 +13,9 @@ rule delly:
     log:
         config["output"] + "/logs/delly/{sample}.log",
     threads: 40
-    shadow:
-        "shallow"
-    singularity:
-        "/PATH/TO/singularity/delly.sif"
-    envmodules:
-        "delly2/" + config["delly_version"],
     shell:
         """
-
+        ml Delly/{config[delly_version]}
         export OMP_NUM_THREADS={threads}
 
         delly call -g {input.ref} -o {output.vcf} {input.bam} > {log} 2>&1

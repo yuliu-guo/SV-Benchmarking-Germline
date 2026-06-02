@@ -2,6 +2,10 @@
 rule dragen:
     input:
         bam=config["sample_path"] + "{sample}.bam",
+        sv_vcf=config["dragen_dir"] + "{sample}.sv.vcf.gz",
+        sv_tbi=config["dragen_dir"] + "{sample}.sv.vcf.gz.tbi",
+        cnv_vcf=config["dragen_dir"] + "{sample}.cnv.vcf.gz",
+        cnv_tbi=config["dragen_dir"] + "{sample}.cnv.vcf.gz.tbi",
     output:
         sv_vcf=config["output"] + "/callers/dragen/{sample}.sv.vcf.gz",
         sv_tbi=config["output"] + "/callers/dragen/{sample}.sv.vcf.gz.tbi",
@@ -17,11 +21,11 @@ rule dragen:
     threads: 1
     shell:
         """
-        ln -s {params.dragen_dir}/{wildcards.sample}.sv.vcf.gz {output.sv_vcf}
-        ln -s {params.dragen_dir}/{wildcards.sample}.sv.vcf.gz.tbi {output.sv_tbi}
-        ln -s {params.dragen_dir}/{wildcards.sample}.cnv.vcf.gz {output.cnv_vcf}
-        ln -s {params.dragen_dir}/{wildcards.sample}.cnv.vcf.gz.tbi {output.cnv_tbi}
-        """
+                ln -s {params.dragen_dir}/{wildcards.sample}.sv.vcf.gz {output.sv_vcf}
+                ln -s {params.dragen_dir}/{wildcards.sample}.sv.vcf.gz.tbi {output.sv_tbi}
+                ln -s {params.dragen_dir}/{wildcards.sample}.cnv.vcf.gz {output.cnv_vcf}
+                ln -s {params.dragen_dir}/{wildcards.sample}.cnv.vcf.gz.tbi {output.cnv_tbi}
+                """
 
 
 rule dragen_combine:

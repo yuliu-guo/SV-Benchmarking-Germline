@@ -18,5 +18,5 @@ rule wham:
     shell:
         """
         mkdir -p $(dirname {output.vcf})
-        whamg -a {input.ref} -f {input.bam} > {output.vcf} > {log} 2>&1 
+        whamg -a {input.ref} -f {input.bam} > {output.vcf} 
         """

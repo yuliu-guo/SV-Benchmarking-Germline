@@ -7,7 +7,7 @@ rule clean_bam_for_popdel:
         bam=config["output"] + "/callers/popdel/profiles/{sample}.reheader.bam",
         bai=config["output"] + "/callers/popdel/profiles/{sample}.reheader.bam.bai",
     params:
-        script="scripts/sanitize_sq.awk",
+        script="workflow/scripts/sanitize_sq.awk",
     log:
         "logs/popdel-clean/{sample}.log",
     benchmark:
@@ -73,7 +73,7 @@ rule popdel_profile:
         config["output"] + "/benchmarks/popdel-profile/{sample}.tsv"
     threads: 1
     envmodules:
-        "htslib/" + config["htslib_version"],
+        "HTSlib/" + config["htslib_version"],
         "popdel/" + config["popdel_version"],
         "bcftools/" + config["bcftools_version"],
     shell:
@@ -105,7 +105,7 @@ rule popdel_filter:
         config["output"] + "/benchmarks/popdel-profile/{sample}.tsv"
     threads: 1
     envmodules:
-        "htslib/" + config["htslib_version"],
+        "HTSlib/" + config["htslib_version"],
         "popdel/" + config["popdel_version"],
         "bcftools/" + config["bcftools_version"],
     shell:
@@ -134,8 +134,11 @@ rule popdel_call:
     benchmark:
         config["output"] + "/benchmarks/popdel/{sample}.tsv"
     threads: 40
+    envmodules:
+        "HTSlib/" + config["htslib_version"],
+        "popdel/" + config["popdel_version"],
+        "bcftools/" + config["bcftools_version"],
     shell:
         """
-        module load htslib/{config[htslib_version]} popdel/{config[popdel_version]} bcftools/{config[bcftools_version]}
         popdel call --out {output.vcf} {input.profile_txt} &> {log.call} 
         """

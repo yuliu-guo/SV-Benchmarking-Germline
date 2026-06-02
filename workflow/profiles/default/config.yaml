@@ -18,7 +18,7 @@ use-singularity: true
 use-envmodules: true
 software-deployment-method: [apptainer, env-modules]
 benchmark-extended: true 
-restart-times: 1
+restart-times: 0
 jobs: 50
 # keep-going: true
 default-resources:

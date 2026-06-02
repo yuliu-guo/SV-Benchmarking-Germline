@@ -18,11 +18,8 @@ rule cnvpytor_calling:
         mem_gb=80,
         mem_mb=80000,
         walltime_h=500,
-    singularity:
-        "/PATH/TO/singularity/cnvpytor.sif"
     envmodules:
         "cnvpytor/" + config["cnvpytor_version"],
-        "samtools/" + config["samtools_version"],
     shell:
         "( cnvpytor -root {output.root} -T {input.ref} -rd {input.cram}; "
         "echo === STEP 1 COMPLETE ; "
@@ -67,10 +64,9 @@ rule cnvpytor_postprocess:
     benchmark:
         config["output"] + "/benchmarks/cnvpytor-postprocess/{sample}.tsv"
     shell:
-        "(module load tools perl/{config[perl_version]}  root/{config[root_version]}  yeppp/{config[yeppp_version]}  "
-        "     cnvnator/{config[cnvnator_version]}  cnvpytor/{config[cnvpytor_version]}  htslib/{config[htslib_version]}  "
-        "     bcftools/{config[bcftools_version]} java/{config[java_version]}  "
-        "     gatk/{config[gatk_version]} ; "
+        "(module load BioPerl/{config[perl_version]}  cnvnator/{config[cnvnator_version]}  cnvpytor/{config[cnvpytor_version]}  HTSlib/{config[htslib_version]}  "
+        "     bcftools/{config[bcftools_version]} Java/{config[java_version]}  "
+        "     GATK/{config[gatk_version]} ; "
 
 
         " if [[ '{config[cnvnator_version]}' < '0.3.4' ]]; then "

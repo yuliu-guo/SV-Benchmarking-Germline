@@ -1,4 +1,4 @@
 __default__:
-  group:  example_PBS_group # Replace with your PBS account/group name
+  group:  group_name # Replace with your PBS account/group name
   output: /dev/null
   error:  logs/clusterlogs/

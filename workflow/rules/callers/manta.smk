@@ -1,3 +1,24 @@
+
+def get_scratch_directory(
+    subdirs: List[str], force_workdir_scratch: bool = False
+) -> str:
+    """
+    Auxiliary function that returns the scratch directory location
+    for a given rule.
+
+    Arguments
+    ---------
+    subdirs: List[str]
+        List of subdirectory names.
+    force_workdir_scratch: bool
+        If true, force the scratch directory inside of the
+        working directory.
+    """
+    basedir = Path(pipeline_workdir).joinpath("scratch")
+    if subdirs:
+        for element in subdirs:
+            basedir = basedir.joinpath(element)
+    return basedir.as_posix()
 rule manta_calling:
     input:
         ref=config["reference"],
@@ -17,10 +38,8 @@ rule manta_calling:
     threads: 40
     benchmark:
         config["output"] + "/benchmarks/manta/{sample}.tsv"
-    singularity:
-        "/PATH/TO/singularity/manta.sif"
     envmodules:
-        "anaconda2/" + config["anaconda2_version"],
+        "Anaconda2/" + config["anaconda2_version"],
         "manta/" + config["manta_version"],
     resources:
         mem_gb=80,
