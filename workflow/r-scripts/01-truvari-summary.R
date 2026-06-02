@@ -1,7 +1,7 @@
-library(jsonlite) 
-library(tidyverse) 
-library(ggrepel) 
-library(forcats) 
+library(jsonlite) # on server
+library(tidyverse) # on server
+library(ggrepel) # on server
+library(forcats) # on server
 library(ggforce)
 library(VariantAnnotation) 
 library(here)
@@ -33,6 +33,14 @@ theme_set(theme_bw(base_size = 11))
 # theme_update(text=element_text(size=10,family="Arial"))
 options(repr.plot.width = 17, repr.plot.height = 6)
 
+# available color palettes
+# colors <- palettes_d_names |> filter(novelty == FALSE, length >= 16,  type == "qualitative") |> arrange(type, length)
+# for(i in 1:nrow(colors)){
+# color <- colors[i,]
+# color_name <- str_c(color$package, "::", color$palette)
+# print(str_c(color_name, " - ", color$type, " n = ", color$length))
+# print(paletteer_d(palette=color_name, n=16,type = ))
+# }
 
 color_pal_set <- "ggthemes::Tableau_20" # set to your fav color name
 
@@ -109,10 +117,13 @@ for (data_folder_name in data_folders) {
     print(temp)
     print("Processing raw input....")
     data <- temp %>%
-      dplyr::select(-contains("gt")) %>% # get rid of genotyping nonsense
-      unnest_legacy() %>%
-      mutate(across(all_of(dbl_vars), as.double)) %>%
-      # mutate(across(!dbl_vars, as.integer)) %>% # convert everything
+      dplyr::select(-"gt_matrix") %>% # get rid of genotyping nonsense
+      dplyr::select(-contains("gt")) 
+    head(data) 
+    data <- data %>% # get rid of genotyping nonsense
+        unnest(cols = dplyr::where(is.list)) %>% 
+        mutate(across(all_of(dbl_vars), as.double)) %>%
+        # mutate(across(!dbl_vars, as.integer)) %>% # convert everything
       mutate(file = str_remove(file, data_folder)) %>%
       mutate(file = str_remove(file, "/summary.json")) %>% # caller names from files
       separate(file, c(NA, "caller", "sample"), sep = "/")
@@ -211,7 +222,7 @@ for (data_folder_name in data_folders) {
       cols_label_with(fn = ~ gsub("recall", "R", .)) %>%
       cols_label_with(fn = ~ gsub("f1", "F1", .)) %>%
       fmt_number(decimals = 2) %>% 
-      data_color(columns=f1_NA12878:recall_mean, palette = c("#E7F4E9FF","#C7E5C9FF", "#A5D6A6FF", "#80C684FF", "#66BA6AFF",
+      data_color(columns=f1_NA12879:recall_mean, palette = c("#E7F4E9FF","#C7E5C9FF", "#A5D6A6FF", "#80C684FF", "#66BA6AFF",
                                                                          "#4CAE50FF", "#439F46FF", "#388D3BFF", "#2D7D32FF","#1A5E1FFF")) # ggsci::green_material
     # add better styling
     last_recall_sample <- paste0("recall_", tail(sample_names, 1))

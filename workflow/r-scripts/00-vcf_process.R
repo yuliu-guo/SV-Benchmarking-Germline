@@ -177,7 +177,7 @@ vcf_process_all_raw <- function(truvari_folder = "pedigree-results/truvari", dat
       filter(!is.na(caller)) %>% # remove anything not mapped properly
       mutate(status = case_when(status == "fn" ~ "False Negative", status == "fp" ~ "False Positive", status == "tp-comp" ~ "True Positive"))
     print(levels(overall_data$sample))
-    sample_names <- c("NA12879", "NA12881", "NA12882", "NA12878")
+    sample_names <- c("200915", "200921", "NA24385")
     focus_sample <- sample_names[1]
     levels(overall_data$sample) <- sample_names
 
