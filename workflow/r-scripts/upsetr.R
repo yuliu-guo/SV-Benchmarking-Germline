@@ -1,6 +1,6 @@
-library(tidyverse) 
+library(tidyverse) # on server
 # need openssl 1.1.1, make sure to load it
-library(StructuralVariantAnnotation) 
+library(StructuralVariantAnnotation) # on server
 library(janitor)
 library(eulerr)
 library(here)
@@ -12,6 +12,7 @@ source(here("r-scripts", "00-vcf_process.R"))
 options(repr.plot.width = 16, repr.plot.height = 9)
 
 theme_set(theme_bw())
+
 truvari_run <- "type-ignored"
 truvari_folder <- here("pedigree-results", "truvari")
 data_folder <- here("pedigree-results", "truvari", truvari_run)
