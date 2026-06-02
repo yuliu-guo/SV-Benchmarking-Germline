@@ -1,0 +1,20 @@
+#############################################################################
+# This config file is a necessary input file for the Minigraph-Cactus Snakemake
+# pipeline: cactus_minigraph.smk. It contains the parameters needed to run the pipeline.
+#
+# This pipeline uses the Minigraph-Cactus pipeline to create a pangenome graph and
+# align genomes.
+# https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md
+#############################################################################
+
+input_file: "cactus_HPRCv1_samples_prodGRCh38.txt"
+cactus_2.9.9: "/PATH/TO/containerization/cactus_2.9.9.sif"
+singularity_version: "4.0.2"
+reference_samples: "GRCh38 CHM13"
+prefix: "250921.hprc-v1.0-plus-PlatinumPedigree"
+cactus-minigraph-config: "/PATH/TO/minigraph-cactus-snakemake-1.1/cactus_progressive_config_100sBatch.xml"
+
+
+input_files_dir: "/PATH/TO/minigraph-cactus-snakemake-1.1/input_seq_files"
+
+output_dir: "/PATH/TO/minigraph-cactus-snakemake-results"

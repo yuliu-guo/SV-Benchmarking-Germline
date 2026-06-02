@@ -1,0 +1,45 @@
+# references for grch38 
+reference: "/PATH/TO/HUMAN_GENOME/hg38.fa"
+human_ref_dict: "/PATH/TO/HUMAN_GENOME/hg38/h38.dict"
+sonic: "/PATH/TO/HUMAN_GENOME/GRCh38.sonic" # Required for Tardis - Standalone SONIC builder example can be found at:https://github.com/calkan/sonic/tree/f5b20147cacc2cada0ea8042f2aa84a1a99acd98
+
+
+# the truth vcf.gz
+truth: "/PATH/TO/platinum-pedigree-data/merged_hg38.svs.sort.oa.vcf.gz"  #can be downloaded from https://github.com/Platinum-Pedigree-Consortium/Platinum-Pedigree-Datasets
+
+# where the sample BAMs (aligned to GiraffeGraph) are 
+sample_path: "/PATH/TO/graph-dataset/" 
+
+truvari_bed: "/PATH/TO/NA12878_hq_v1.2.svs.bed" #can be downloaded from https://github.com/Platinum-Pedigree-Consortium/Platinum-Pedigree-Datasets
+
+# where the results are output 
+output: "graph_results" 
+
+# tool settings
+dragen_dir: "/PATH/TO/DRAGEN/RESULTS/" #DRAGEN results were generated with DRAGEN server Box or ICA cloud. Here is only extracting the results for downstream analysis 
+
+svtypes: ["DEL","INS","INV"]
+
+samples: ["NA12879", "NA12878", "NA12882", "NA12881"]
+
+### Setting Callers
+# dysgu 
+callers: [
+   "wham",
+    "lumpy",
+    "dysgu",
+    "octopus",
+    "smoove",
+    "tardis",
+    "manta",
+    "svaba",
+    "cnvpytor",
+    "delly",
+    "tiddit",
+    "gridss",
+    "popdel",
+] 
+
+# define the truvari runs here
+truvari_runs:
+  type-ignored: "--pctseq 0 --typeignore --passonly "
