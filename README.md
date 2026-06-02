@@ -22,6 +22,12 @@ An equivalent **[omnibenchmark](https://docs.omnibenchmark.org/latest/)** pipeli
 snakemake --configfile config/pedigree.yaml --profile default
 ```
 
+Or specifying the resources
+```bash
+snakemake --configfile config/pedigree.yaml --jobs 10 --cluster "qsub -W group_list=group_name -A group_name -l walltime={resources.walltime_h}:00:00 -l mem={resources.mem_mb}MB -l nodes=1:ppn={threads} -M email@address.com" --keep-going --groups truvari=trugroup --group-components trugroup=10
+
+```
+
 *Jobs are submitted to the cluster using the `default` profile.*
 
 ---
@@ -31,8 +37,10 @@ snakemake --configfile config/pedigree.yaml --profile default
 ```
 project/
 ├── config/
-│   ├── versions.yaml        
-│   └── config.yaml          # Example run configuration
+|   ├── graph.yaml
+│   ├── tool_versions.yaml        
+│   └── pedigree.yaml          
+├── minigraph-cactus-snakemake-1.1/   # seperate snakemake pipeline for graph-aligned BAM files    
 ├── workflow/
 │   ├── Snakefile            # Entry point
 │   ├── profiles/default/    # Cluster profile 
