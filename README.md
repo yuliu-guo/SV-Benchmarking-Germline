@@ -116,10 +116,6 @@ The pipeline creates:
 * Update `truth_set` in the YAML.
 * Adjust the `samples` list and optionally set a new output directory.
 
----
 
-##  Notes
-
-* Placeholder 
 
 
